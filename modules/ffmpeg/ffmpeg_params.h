@@ -58,8 +58,10 @@ struct ffmpeg_producer_params
 
 	FFMPEG_Resource     resource_type;
 	std::wstring        resource_name;
-
+	std::wstring        guid;
 	std::vector<option> options;
+
+	
 
 	ffmpeg_producer_params() 
 		: loop(false)
@@ -68,6 +70,7 @@ struct ffmpeg_producer_params
 		, filter_str(L"")
 		, resource_type(FFMPEG_FILE)
 		, resource_name(L"")
+		, guid(L"")
 	{
 	}
 

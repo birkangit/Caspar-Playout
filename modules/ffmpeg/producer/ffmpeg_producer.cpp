@@ -119,6 +119,7 @@ struct ffmpeg_producer : public core::frame_producer
 
 	int64_t														frame_number_;
 	uint32_t													file_frame_number_;
+	std::wstring												guid_;
 		
 public:
 	explicit ffmpeg_producer(const safe_ptr<core::frame_factory>& frame_factory, const std::wstring& filename, FFMPEG_Resource resource_type, const std::wstring& filter, bool loop, uint32_t start, uint32_t length, bool thumbnail_mode, const std::wstring& custom_channel_order, const ffmpeg_producer_params& vid_params)
@@ -184,6 +185,7 @@ public:
 			BOOST_THROW_EXCEPTION(averror_stream_not_found() << msg_info("No streams found"));
 
 		muxer_.reset(new frame_muxer(fps_, frame_factory, thumbnail_mode_, audio_channel_layout, filter));
+		guid_ = vid_params.guid; 
 	}
 
 	// frame_producer
@@ -253,7 +255,8 @@ public:
 																			% static_cast<int32_t>(file_nb_frames())
 							<< core::monitor::message("/file/fps")			% fps_
 							<< core::monitor::message("/file/path")			% path_relative_to_media_
-							<< core::monitor::message("/loop")				% input_.loop();
+							<< core::monitor::message("/loop")				% input_.loop()
+							<< core::monitor::message("/guid")				% guid_;
 	}
 	
 	safe_ptr<core::basic_frame> render_specific_frame(uint32_t file_position, int hints)
@@ -405,6 +408,7 @@ public:
 		info.add(L"nb-frames",			nb_frames2 == std::numeric_limits<int64_t>::max() ? -1 : nb_frames2);
 		info.add(L"file-frame-number",	file_frame_number_);
 		info.add(L"file-nb-frames",		file_nb_frames());
+		info.add(L"GUID",		guid_);
 		return info;
 	}
 
@@ -541,6 +545,7 @@ safe_ptr<core::frame_producer> create_producer(
 	auto start		= params.get(L"SEEK", static_cast<uint32_t>(0));
 	auto length		= params.get(L"LENGTH", std::numeric_limits<uint32_t>::max());
 	auto filter_str = params.get(L"FILTER", L""); 	
+	auto guid		= params.get(L"GUID", L""); 	
 	auto custom_channel_order	= params.get(L"CHANNEL_LAYOUT", L"");
 
 	boost::replace_all(filter_str, L"DEINTERLACE_BOB", L"YADIF=1:-1");
@@ -562,6 +567,7 @@ safe_ptr<core::frame_producer> create_producer(
 			vid_params.options.push_back(option(name, value));
 		}
 	}
+	vid_params.guid = guid;
 
 	
 	return create_producer_destroy_proxy(make_safe<ffmpeg_producer>(frame_factory, filename, resource_type, filter_str, loop, start, length, false, custom_channel_order, vid_params));
