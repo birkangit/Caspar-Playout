@@ -138,7 +138,19 @@ void configure(const std::wstring& filename)
 		CASPAR_LOG(error) << L"Failed to create configured directories.";
 	}
 }
+
+std::wstring getFileName(std::wstring fileName)
+{
+
+	check_is_configured();
 	
+	if ((fileName.find(L":") == 1) || (fileName.find(L"\\") == 0))
+			return fileName;
+		else
+			return media + L"\\" + fileName;
+	
+}
+
 const std::wstring& media_folder()
 {
 	check_is_configured();
