@@ -59,7 +59,7 @@ public:
 	};
 
 	virtual ~frame_producer(){}	
-
+	std::wstring ID;
 	virtual std::wstring print() const = 0; // nothrow
 	virtual boost::property_tree::wptree info() const = 0;
 

@@ -1243,6 +1243,19 @@ bool LoadbgCommand::DoExecute()
 			transitionInfo.direction = transition_direction::from_left;
 	}
 	
+	static const boost::wregex expr2(L".*(?<GD>GUID)\\s*(?<GUIDSTR>\\w+).*");
+	boost::wsmatch what2;
+
+
+	std::wstring guidValue = L"";
+	if(boost::regex_match(message, what2, expr2))
+	{
+
+		auto GUID = what2["GD"].str();
+		guidValue = what2["GUIDSTR"].str();
+
+	}
+
 	//Perform loading of the clip
 	try
 	{
@@ -1260,8 +1273,11 @@ bool LoadbgCommand::DoExecute()
 			BOOST_THROW_EXCEPTION(file_not_found() << msg_info(_parameters.size() > 0 ? narrow(_parameters[0]) : ""));
 
 		bool auto_play = std::find(_parameters.begin(), _parameters.end(), L"AUTO") != _parameters.end();
-
+		
+		pFP->ID = guidValue;
 		auto pFP2 = create_transition_producer(GetChannel()->get_video_format_desc().field_mode, pFP, transitionInfo);
+		
+		pFP2->ID = guidValue;
 		GetChannel()->stage()->load(GetLayerIndex(), pFP2, false, auto_play ? transitionInfo.duration : -1); // TODO: LOOP
 	
 		SetReplyString(TEXT("202 LOADBG OK\r\n"));
@@ -2140,6 +2156,45 @@ void GenerateChannelInfo(int index, const safe_ptr<core::video_channel>& pChanne
 	replyString << index+1 << TEXT(" ") << pChannel->get_video_format_desc().name << TEXT(" PLAYING") << TEXT("\r\n");
 }
 
+bool ShortInfoCommand::DoExecute()
+{
+	std::wstringstream replyString;
+	
+	boost::property_tree::xml_writer_settings<std::wstring> w(' ', 3);
+
+	try
+	{
+
+		if(_parameters.size() >= 1 )
+		{
+			
+			replyString << L"201 SHORTINFO OK\r\n";
+				
+			boost::property_tree::wptree info;
+
+			std::vector<std::wstring> split;
+			boost::split(split, _parameters[0], boost::is_any_of("-"));
+					
+			int layer = std::numeric_limits<int>::min();
+			int channel = boost::lexical_cast<int>(split[0]) - 1;
+
+			if(split.size() > 1)
+				layer = boost::lexical_cast<int>(split[1]);
+			
+			replyString << channels_.at(channel)->stage()->shortinfo(layer);
+		}
+	}
+	catch(...)
+	{
+		SetReplyString(TEXT("403 INFO ERROR\r\n"));
+		return false;
+	}
+
+	replyString << TEXT("\r\n");
+	SetReplyString(replyString.str());
+	return true;
+}
+
 bool InfoCommand::DoExecute()
 {
 	std::wstringstream replyString;
@@ -2240,6 +2295,7 @@ bool InfoCommand::DoExecute()
 		}
 		else if(_parameters.size() >= 2 && _parameters[1] == L"DELAY")
 		{
+			
 			replyString << L"201 INFO DELAY OK\r\n";
 			boost::property_tree::wptree info;
 
@@ -2251,7 +2307,7 @@ bool InfoCommand::DoExecute()
 
 			if(split.size() > 1)
 				layer = boost::lexical_cast<int>(split[1]);
-				
+
 			if(layer == std::numeric_limits<int>::min())
 			{	
 				info.add_child(L"channel-delay", channels_.at(channel)->delay_info());
@@ -2262,6 +2318,7 @@ bool InfoCommand::DoExecute()
 					.add(L"index", layer);
 			}
 			boost::property_tree::xml_parser::write_xml(replyString, info, w);
+
 		}
 		else // channel
 		{			

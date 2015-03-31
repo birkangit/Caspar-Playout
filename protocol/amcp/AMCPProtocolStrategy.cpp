@@ -347,6 +347,7 @@ AMCPCommandPtr AMCPProtocolStrategy::CommandFactory(const std::wstring& str)
 	else if(s == TEXT("DATA"))			return std::make_shared<DataCommand>();
 	else if(s == TEXT("CINF"))			return std::make_shared<CinfCommand>();
 	else if(s == TEXT("INFO"))			return std::make_shared<InfoCommand>(channels_);
+	else if(s == TEXT("SHORTINFO"))		return std::make_shared<ShortInfoCommand>(channels_);
 	else if(s == TEXT("CLS"))			return std::make_shared<ClsCommand>();
 	else if(s == TEXT("TLS"))			return std::make_shared<TlsCommand>();
 	else if(s == TEXT("VERSION"))		return std::make_shared<VersionCommand>();

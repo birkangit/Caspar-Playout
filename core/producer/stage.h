@@ -99,7 +99,7 @@ public:
 	void set_video_format_desc(const video_format_desc& format_desc);
 		
 	monitor::subject& monitor_output();
-
+	std::wstring shortinfo(int index) const;
 private:
 	struct implementation;
 	safe_ptr<implementation> impl_;

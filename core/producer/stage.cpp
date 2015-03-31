@@ -491,6 +491,62 @@ public:
 			return get_layer(index).delay_info();
 		}, high_priority));
 	}
+
+	std::wstring shortinfo(int index) const
+	{
+
+		std::wstringstream replyString;
+		boost::property_tree::wptree info__;
+
+		auto it = layers_.find(index);
+		if (it != std::end(layers_))
+		{
+			if (it->second->foreground() != frame_producer::empty())
+			{
+				replyString << it->second->foreground()->ID << L"#" << it->second->foreground()->info().get<std::wstring>(L"filename");
+			}
+			else
+			{
+				replyString << L"#";
+			}
+
+			if (it->second->background() != frame_producer::empty())
+			{
+				if (it->second->background()->info().get_child_optional(L"destination")){
+					replyString << "#" << it->second->background()->ID << L"#" << it->second->background()->info().get<std::wstring>(L"destination.producer.filename");
+				}
+				else if (it->second->background()->info().get_child_optional(L"filename"))
+				{
+					replyString << "#" << it->second->background()->ID << L"#" << it->second->background()->info().get<std::wstring>(L"filename");
+				}
+				else
+				{
+					replyString << L"##";
+				}
+			}
+			else
+			{
+				replyString << L"##";
+			}
+
+			if (it->second->foreground() != frame_producer::empty())
+			{
+				int currenttotal = it->second->info().get<int>(L"nb_frames");
+				int currentleft = it->second->info().get<int>(L"frames-left");
+				replyString << L"#" << currenttotal << L"#" << (currenttotal - currentleft) << "#" << it->second->foreground()->info().get<float>(L"fps") << "#" << it->second->foreground()->info().get<std::wstring>(L"loop") << "#" << ((it->second->is_paused()) ? L"false" : L"true");
+			}
+			else
+			{
+				replyString << L"###";
+			}
+		}
+		else
+		{
+			replyString << L"#####";
+		}
+		return replyString.str();
+	}
+
 };
 
 stage::stage(
@@ -526,4 +582,5 @@ boost::unique_future<boost::property_tree::wptree> stage::info(int index) const{
 boost::unique_future<boost::property_tree::wptree> stage::delay_info() const{return impl_->delay_info();}
 boost::unique_future<boost::property_tree::wptree> stage::delay_info(int index) const{return impl_->delay_info(index);}
 monitor::subject& stage::monitor_output(){return *impl_->monitor_subject_;}
+std::wstring stage::shortinfo(int index) const{ return impl_->shortinfo(index); }
 }}
