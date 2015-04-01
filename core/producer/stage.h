@@ -100,6 +100,7 @@ public:
 		
 	monitor::subject& monitor_output();
 	std::wstring shortinfo(int index) const;
+	void clearcue(int index); 
 private:
 	struct implementation;
 	safe_ptr<implementation> impl_;

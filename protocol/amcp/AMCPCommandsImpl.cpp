@@ -2195,6 +2195,53 @@ bool ShortInfoCommand::DoExecute()
 	return true;
 }
 
+bool ClearCueCommand::DoExecute()
+{
+	std::wstringstream replyString;
+	
+	try
+	{
+
+		if(_parameters.size() >= 1 )
+		{
+			
+			//replyString << L"201 SHORTINFO OK\r\n";
+				
+			boost::property_tree::wptree info;
+
+			std::vector<std::wstring> split;
+			boost::split(split, _parameters[0], boost::is_any_of("-"));
+					
+			int layer = std::numeric_limits<int>::min();
+			
+			int channel = boost::lexical_cast<int>(split[0]) - 1;
+
+			if(split.size() > 1)
+				layer = boost::lexical_cast<int>(split[1]);
+
+			if (channels_.size()>0)
+			{
+				channels_.at(channel)->stage()->clearcue(layer);
+			}
+			else
+			{
+				replyString << L"CLEARCUE ERROR\r\n";
+			}
+
+			replyString << L"CLEARCUE OK\r\n";
+		}
+	}
+	catch(...)
+	{
+		SetReplyString(TEXT("CLEARCUE ERROR\r\n"));
+		return false;
+	}
+
+	replyString << TEXT("\r\n");
+	SetReplyString(replyString.str());
+	return true;
+}
+
 bool InfoCommand::DoExecute()
 {
 	std::wstringstream replyString;

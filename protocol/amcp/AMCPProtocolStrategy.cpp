@@ -361,6 +361,7 @@ AMCPCommandPtr AMCPProtocolStrategy::CommandFactory(const std::wstring& str)
 	//}
 	else if(s == TEXT("KILL"))			return std::make_shared<KillCommand>();
 	else if(s == TEXT("RESTART"))		return std::make_shared<RestartCommand>();
+	else if(s == TEXT("CLEARCUE"))		return std::make_shared<ClearCueCommand>(channels_);
 	return nullptr;
 }
 

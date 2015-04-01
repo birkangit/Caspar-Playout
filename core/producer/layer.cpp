@@ -129,10 +129,26 @@ public:
 				return foreground_->last_frame();
 
 			auto frames_left = static_cast<int64_t>(foreground_->nb_frames()) - static_cast<int64_t>(++frame_number_) - static_cast<int64_t>(auto_play_delta_);
+
+			if(frames_left < 1 && background_ == frame_producer::empty())
+			{
+				is_paused_ = true;
+				return receive(hints);
+			}
+
 			if(auto_play_delta_ > -1 && frames_left < 1)
 			{
-				play();
-				return receive(hints);
+				if(background_ != frame_producer::empty())
+				{
+					play();
+					return receive(hints);
+				}
+				else
+				{
+					is_paused_ = true;
+					return receive(hints);
+					//return disable_audio(foreground_->last_frame());
+				}
 			}
 
 			current_frame_age_ = frame->get_and_record_age_millis();
@@ -188,6 +204,11 @@ public:
 		foreground_			= producer;
 		foreground_->monitor_output().attach_parent(monitor_subject_);
 	}
+
+	void clearcue()
+	{
+		background_ = frame_producer::empty();
+	}
 };
 
 layer::layer(int index) : impl_(new implementation(index)){}
@@ -216,4 +237,5 @@ boost::unique_future<std::wstring> layer::call(bool foreground, const std::wstri
 boost::property_tree::wptree layer::info() const{return impl_->info();}
 boost::property_tree::wptree layer::delay_info() const{return impl_->delay_info();}
 monitor::subject& layer::monitor_output(){return *impl_->monitor_subject_;}
+void layer::clearcue(){ impl_->clearcue(); }
 }}

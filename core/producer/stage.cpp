@@ -547,7 +547,16 @@ public:
 		return replyString.str();
 	}
 
+	void clearcue(int index)
+	{
+		executor_.begin_invoke([=]
+		{
+			layers_.find(index)->second->clearcue();
+		}, high_priority);
+	}
 };
+
+
 
 stage::stage(
 		const safe_ptr<diagnostics::graph>& graph,
@@ -583,4 +592,5 @@ boost::unique_future<boost::property_tree::wptree> stage::delay_info() const{ret
 boost::unique_future<boost::property_tree::wptree> stage::delay_info(int index) const{return impl_->delay_info(index);}
 monitor::subject& stage::monitor_output(){return *impl_->monitor_subject_;}
 std::wstring stage::shortinfo(int index) const{ return impl_->shortinfo(index); }
+void stage::clearcue(int index) { return impl_->clearcue(index); }
 }}

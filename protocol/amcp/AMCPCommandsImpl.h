@@ -235,6 +235,16 @@ private:
 	const std::vector<safe_ptr<core::video_channel>>& channels_;
 };
 
+class ClearCueCommand : public AMCPCommandBase<false, AddToQueue, 0>
+{
+public:
+	std::wstring print() const { return L"ClearCueCommand";}
+	ClearCueCommand(const std::vector<safe_ptr<core::video_channel>>& channels) : channels_(channels){}
+	bool DoExecute();
+private:
+	const std::vector<safe_ptr<core::video_channel>>& channels_;
+};
+
 class VersionCommand : public AMCPCommandBase<false, AddToQueue, 0>
 {
 	std::wstring print() const { return L"VersionCommand";}

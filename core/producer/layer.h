@@ -68,6 +68,7 @@ public:
 	boost::property_tree::wptree delay_info() const;
 	
 	monitor::subject& monitor_output();
+	void clearcue();
 private:
 	struct implementation;
 	safe_ptr<implementation> impl_;
