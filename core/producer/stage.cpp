@@ -533,7 +533,7 @@ public:
 			{
 				int currenttotal = it->second->info().get<int>(L"nb_frames");
 				int currentleft = it->second->info().get<int>(L"frames-left");
-				replyString << L"#" << currenttotal << L"#" << (currenttotal - currentleft) << "#" << it->second->foreground()->info().get<float>(L"fps") << "#" << it->second->foreground()->info().get<std::wstring>(L"loop") << "#" << ((it->second->is_paused()) ? L"false" : L"true");
+				replyString << L"#" << currenttotal << L"#" << (currenttotal - currentleft) << "#" << it->second->foreground()->info().get<float>(L"fps") << "#" << it->second->foreground()->info().get<std::wstring>(L"loop") << "#" << ((it->second->is_paused()) ? L"true" : L"false");
 			}
 			else
 			{
