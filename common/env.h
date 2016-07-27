@@ -31,6 +31,7 @@ void configure(const std::wstring& filename);
 
 std::wstring getFileName(std::wstring fileName);
 const std::wstring& media_folder();
+const std::wstring& playout_folders();
 
 const std::wstring& log_folder();
 const std::wstring& template_folder();

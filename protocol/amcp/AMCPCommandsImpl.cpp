@@ -1278,7 +1278,9 @@ bool LoadbgCommand::DoExecute()
 		auto pFP2 = create_transition_producer(GetChannel()->get_video_format_desc().field_mode, pFP, transitionInfo);
 		
 		pFP2->ID = guidValue;
-		GetChannel()->stage()->load(GetLayerIndex(), pFP2, false, auto_play ? transitionInfo.duration : -1); // TODO: LOOP
+		bool preview = std::find(_parameters.begin(), _parameters.end(), L"PREVIEW") != _parameters.end();
+
+		GetChannel()->stage()->load(GetLayerIndex(), pFP2, preview, auto_play ? transitionInfo.duration : -1); // TODO: LOOP
 	
 		SetReplyString(TEXT("202 LOADBG OK\r\n"));
 
@@ -2160,7 +2162,7 @@ bool ShortInfoCommand::DoExecute()
 {
 	std::wstringstream replyString;
 	
-	boost::property_tree::xml_writer_settings<std::wstring> w(' ', 3);
+	//boost::property_tree::xml_writer_settings<std::wstring> w(' ', 3);
 
 	try
 	{
@@ -2168,9 +2170,9 @@ bool ShortInfoCommand::DoExecute()
 		if(_parameters.size() >= 1 )
 		{
 			
-			replyString << L"201 SHORTINFO OK\r\n";
+			//replyString << L"201 SHORTINFO OK\r\n";
 				
-			boost::property_tree::wptree info;
+			//boost::property_tree::wptree info;
 
 			std::vector<std::wstring> split;
 			boost::split(split, _parameters[0], boost::is_any_of("-"));
@@ -2280,6 +2282,10 @@ bool InfoCommand::DoExecute()
 			info.add(L"paths.initial-path", boost::filesystem::initial_path<boost::filesystem::path>().wstring() + L"\\");
 
 			boost::property_tree::write_xml(replyString, info, w);
+		}
+		else if (_parameters.size() >= 1 && _parameters[0] == L"MEDIA-PATHS")
+		{
+			replyString << caspar::env::playout_folders();
 		}
 		else if(_parameters.size() >= 1 && _parameters[0] == L"QUEUES")
 		{
