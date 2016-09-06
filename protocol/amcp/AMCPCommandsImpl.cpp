@@ -1283,8 +1283,9 @@ bool LoadbgCommand::DoExecute()
 		bool hasParkNext = std::find(_parameters.begin(), _parameters.end(), L"PARKNEXT") != _parameters.end();
 
 		GetChannel()->stage()->load(GetLayerIndex(), pFP2, preview, auto_play ? transitionInfo.duration : -1); // TODO: LOOP
-		GetChannel()->stage()->setLayerEvent(GetLayerIndex(), core::layer_events::PARK_NEXT);
-	
+
+		GetChannel()->stage()->setLayerEvent(GetLayerIndex(), hasParkNext ? core::layer_events::PARK_NEXT : core::layer_events::NONE);
+
 		SetReplyString(TEXT("202 LOADBG OK\r\n"));
 
 		return true;
