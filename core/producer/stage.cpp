@@ -554,6 +554,14 @@ public:
 			layers_.find(index)->second->clearcue();
 		}, high_priority);
 	}
+
+	void setLayerEvent(int index, layer_events event_)
+	{
+		executor_.begin_invoke([=]
+		{
+			layers_.find(index)->second->setEvent(event_);
+		}, high_priority);
+	}
 };
 
 
@@ -593,4 +601,5 @@ boost::unique_future<boost::property_tree::wptree> stage::delay_info(int index) 
 monitor::subject& stage::monitor_output(){return *impl_->monitor_subject_;}
 std::wstring stage::shortinfo(int index) const{ return impl_->shortinfo(index); }
 void stage::clearcue(int index) { return impl_->clearcue(index); }
+void stage::setLayerEvent(int index, layer_events event_) { return impl_->setLayerEvent(index,event_); }
 }}

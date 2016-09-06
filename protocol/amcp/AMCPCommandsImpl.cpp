@@ -88,6 +88,7 @@
 #include <boost/format.hpp>
 
 #include <tbb/concurrent_unordered_map.h>
+#include <core/producer/layer_events.h>
 
 /* Return codes
 
@@ -1279,8 +1280,10 @@ bool LoadbgCommand::DoExecute()
 		
 		pFP2->ID = guidValue;
 		bool preview = std::find(_parameters.begin(), _parameters.end(), L"PREVIEW") != _parameters.end();
+		bool hasParkNext = std::find(_parameters.begin(), _parameters.end(), L"PARKNEXT") != _parameters.end();
 
 		GetChannel()->stage()->load(GetLayerIndex(), pFP2, preview, auto_play ? transitionInfo.duration : -1); // TODO: LOOP
+		GetChannel()->stage()->setLayerEvent(GetLayerIndex(), core::layer_events::PARK_NEXT);
 	
 		SetReplyString(TEXT("202 LOADBG OK\r\n"));
 

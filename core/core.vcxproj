@@ -262,6 +262,7 @@
     <ClInclude Include="parameters\parameters.h" />
     <ClInclude Include="monitor\monitor.h" />
     <ClInclude Include="producer\channel\channel_producer.h" />
+    <ClInclude Include="producer\layer_events.h" />
     <ClInclude Include="producer\media_info\in_memory_media_info_repository.h" />
     <ClInclude Include="producer\media_info\media_info.h" />
     <ClInclude Include="producer\media_info\media_info_repository.h" />

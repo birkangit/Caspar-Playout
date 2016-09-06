@@ -175,6 +175,9 @@
     <ClInclude Include="fwd.h">
       <Filter>source</Filter>
     </ClInclude>
+    <ClInclude Include="producer\layer_events.h">
+      <Filter>source\producer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="producer\transition\transition_producer.cpp">

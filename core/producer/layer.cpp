@@ -39,6 +39,7 @@ struct layer::implementation
 	bool						is_paused_;
 	int64_t						current_frame_age_;
 	safe_ptr<monitor::subject>	monitor_subject_;
+	layer_events				event_type_;
 
 public:
 	implementation(int index) 
@@ -140,8 +141,44 @@ public:
 			{
 				if(background_ != frame_producer::empty())
 				{
-					play();
-					return receive(hints);
+					switch (event_type_)
+					{
+					case layer_events::NONE:
+						play();
+						return receive(hints);
+						break;
+					case layer_events::PARK:
+						pause();
+						break;
+					case layer_events::PARK_NEXT:
+						event_type_ = layer_events::NONE;
+						play();
+						pause();
+						break;
+					case layer_events::STOP:
+						foreground_ = frame_producer::empty();
+						return core::basic_frame::empty();
+						break;
+					case layer_events::LIVE:
+						break;
+					case layer_events::LOOP:
+						pause();
+						foreground_->call(L"HASSEEK 0");
+						play();
+						return receive(hints);
+						break;
+					case layer_events::PAUSE:
+						pause();
+						break;
+					default:
+						play();
+						return receive(hints);
+						break;
+					}
+
+
+
+					
 				}
 				else
 				{
@@ -209,6 +246,11 @@ public:
 	{
 		background_ = frame_producer::empty();
 	}
+
+	void setEvent(layer_events event_type)
+	{
+		event_type_ = event_type;
+	}
 };
 
 layer::layer(int index) : impl_(new implementation(index)){}
@@ -238,4 +280,5 @@ boost::property_tree::wptree layer::info() const{return impl_->info();}
 boost::property_tree::wptree layer::delay_info() const{return impl_->delay_info();}
 monitor::subject& layer::monitor_output(){return *impl_->monitor_subject_;}
 void layer::clearcue(){ impl_->clearcue(); }
+void layer::setEvent(layer_events event_type){ impl_->setEvent(event_type); }
 }}

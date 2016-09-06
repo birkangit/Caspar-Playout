@@ -34,6 +34,7 @@
 #include <boost/thread/future.hpp>
 
 #include <functional>
+#include "layer_events.h"
 
 namespace caspar { namespace core {
 
@@ -100,7 +101,8 @@ public:
 		
 	monitor::subject& monitor_output();
 	std::wstring shortinfo(int index) const;
-	void clearcue(int index); 
+	void clearcue(int index);
+	void setLayerEvent(int index, layer_events event_);
 private:
 	struct implementation;
 	safe_ptr<implementation> impl_;

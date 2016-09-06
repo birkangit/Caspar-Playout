@@ -30,11 +30,13 @@
 #include <boost/property_tree/ptree_fwd.hpp>
 
 #include <string>
+#include "layer_events.h"
 
 namespace caspar { namespace core {
 
 struct frame_producer;
 class basic_frame;
+
 
 class layer : boost::noncopyable
 {
@@ -69,6 +71,7 @@ public:
 	
 	monitor::subject& monitor_output();
 	void clearcue();
+	void setEvent(layer_events event_type);
 private:
 	struct implementation;
 	safe_ptr<implementation> impl_;
