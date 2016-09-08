@@ -153,6 +153,7 @@ public:
 					case layer_events::PARK_NEXT:
 						event_type_ = layer_events::NONE;
 						play();
+						receive(hints);
 						pause();
 						break;
 					case layer_events::STOP:
