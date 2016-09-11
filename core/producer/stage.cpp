@@ -531,9 +531,10 @@ public:
 
 			if (it->second->foreground() != frame_producer::empty())
 			{
-				int currenttotal = it->second->info().get<int>(L"nb_frames");
-				int currentleft = it->second->info().get<int>(L"frames-left");
-				replyString << L"#" << currenttotal << L"#" << (currenttotal - currentleft) << "#" << it->second->foreground()->info().get<float>(L"fps") << "#" << it->second->foreground()->info().get<std::wstring>(L"loop") << "#" << ((it->second->is_paused()) ? L"true" : L"false");
+				int64_t currenttotal = it->second->info().get<int64_t>(L"nb_frames");
+				int64_t currentleft = it->second->info().get<int64_t>(L"frames-left");
+
+				replyString << L"#" << currenttotal << L"#" << (currenttotal - currentleft) << L"#" << it->second->foreground()->info().get<float>(L"fps") << L"#" << it->second->foreground()->info().get<std::wstring>(L"loop") << L"#" << ((it->second->is_paused()) ? L"true" : L"false");
 			}
 			else
 			{
