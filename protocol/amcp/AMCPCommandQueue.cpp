@@ -100,8 +100,14 @@ void AMCPCommandQueue::AddCommand(AMCPCommandPtr pCurrentCommand)
 					running_command_since_.restart();
 				}
 
-				if(pCurrentCommand->Execute()) 
-					CASPAR_LOG(debug) << "Executed command: " << print;
+				if(pCurrentCommand->Execute()) {
+					
+					//ugly hack for not logging shortinfo
+					if (!boost::starts_with(print, L"ShortInfo"))
+						CASPAR_LOG(debug) << "Executed command: " << print;
+					else
+						CASPAR_LOG(trace) << "Executed command: " << print;
+				}
 				else 
 					CASPAR_LOG(warning) << "Failed to execute command: " << print << L" on " << widen(executor_.name());
 			}

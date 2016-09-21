@@ -123,7 +123,7 @@ void setup_console_window()
 
 	// Set console title.
 	std::wstringstream str;
-	str << "CasparCG Server " << caspar::env::version();
+	str << "Libero CasparCG Server " << caspar::env::version();
 #ifdef COMPILE_RELEASE
 	str << " Release";
 #elif  COMPILE_PROFILE
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
 
 	boost::tribool restart = false;
 	tbb::task_scheduler_init init;
-	std::wstring config_file_name(L"casparcg.config");
+	std::wstring config_file_name(L"server.config");
 	
 	try 
 	{

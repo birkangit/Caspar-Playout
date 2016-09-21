@@ -37,6 +37,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #if defined(_MSC_VER)
 #pragma warning (push, 1) // TODO: Legacy code, just disable warnings
@@ -134,8 +135,14 @@ void AMCPProtocolStrategy::Parse(const TCHAR* pData, int charCount, ClientInfoPt
 
 void AMCPProtocolStrategy::ProcessMessage(const std::wstring& message, ClientInfoPtr& pClientInfo)
 {	
-	if(message.length() < 512)
-		CASPAR_LOG(info) << L"Received message from " << pClientInfo->print() << L": " << message << L"\\r\\n";
+	
+	if (message.length() < 512)	{
+		//ugly hack for not logging shortinfo
+		if (!boost::istarts_with(message, L"SHORTINFO"))
+			CASPAR_LOG(info) << L"Received message from " << pClientInfo->print() << L": " << message << L"\\r\\n";
+		else
+			CASPAR_LOG(trace) << L"Received message from " << pClientInfo->print() << L": " << message << L"\\r\\n";
+	}
 	else
 		CASPAR_LOG(info) << L"Received long message from " << pClientInfo->print() << L": " << message.substr(0, 510) << L" [...]\\r\\n";
 	

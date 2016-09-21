@@ -87,3 +87,5 @@
 /modules/newtek/bin
 /modules/newtek/tmp
 /dependencies/cef
+*.opensdf
+*.sdf

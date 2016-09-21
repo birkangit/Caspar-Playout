@@ -33,6 +33,7 @@
 #include <string>
 #include <algorithm>
 #include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #if defined(_MSC_VER)
 #pragma warning (push, 1) // TODO: Legacy code, just disable warnings, will replace with boost::asio in future
@@ -487,7 +488,13 @@ void AsyncEventServer::DoSend(SocketInfo& socketInfo) {
 					{
 						boost::replace_all(socketInfo.sendQueue_.front(), L"\n", L"\\n");
 						boost::replace_all(socketInfo.sendQueue_.front(), L"\r", L"\\r");
-						CASPAR_LOG(info) << L"Sent message to " << socketInfo.host_.c_str() << L": " << socketInfo.sendQueue_.front().c_str();
+						
+						//ugly hack for not logging shortinfo
+						if (!boost::contains(socketInfo.sendQueue_.front().c_str(), L"#"))
+							CASPAR_LOG(info) << L"Sent message to " << socketInfo.host_.c_str() << L": " << socketInfo.sendQueue_.front().c_str();
+						else
+							CASPAR_LOG(trace) << L"Sent message to " << socketInfo.host_.c_str() << L": " << socketInfo.sendQueue_.front().c_str();
+
 					}
 					else
 						CASPAR_LOG(info) << "Sent more than 512 bytes to " << socketInfo.host_.c_str();

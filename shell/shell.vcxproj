@@ -67,7 +67,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="casparcg.config">
+    <None Include="server.config">
       <SubType>Designer</SubType>
     </None>
     <None Include="CasparCG.ico" />

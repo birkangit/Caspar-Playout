@@ -9,9 +9,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="casparcg.config" />
     <None Include="CasparCG.ico" />
     <None Include="casparcg_auto_restart.bat" />
+    <None Include="server.config" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="server.h">
