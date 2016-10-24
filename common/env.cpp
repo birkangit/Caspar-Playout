@@ -42,7 +42,6 @@ namespace caspar { namespace env {
 namespace fs = boost::filesystem;
 
 std::wstring media;
-std::wstring playout_paths;
 std::wstring log;
 std::wstring ftemplate;
 std::wstring data;
@@ -66,7 +65,7 @@ void configure(const std::wstring& filename)
 
 		auto paths = pt.get_child(L"configuration.paths");
 		media = widen(paths.get(L"media-path", initialPath + L"\\media\\"));
-		playout_paths = widen(paths.get(L"playout-paths", initialPath + L"\\media\\"));
+		//playout_paths = widen(paths.get(L"playout-paths", initialPath + L"\\media\\"));
 		log = widen(paths.get(L"log-path", initialPath + L"\\log\\"));
 		ftemplate = fs::complete(fs::path(widen(paths.get(L"template-path", initialPath + L"\\template\\")))).wstring();		
 		data = widen(paths.get(L"data-path", initialPath + L"\\data\\"));
@@ -158,13 +157,6 @@ const std::wstring& media_folder()
 	check_is_configured();
 	return media;
 }
-
-const std::wstring& playout_folders()
-{
-	check_is_configured();
-	return playout_paths;
-}
-
 
 const std::wstring& log_folder()
 {

@@ -2289,7 +2289,9 @@ bool InfoCommand::DoExecute()
 		}
 		else if (_parameters.size() >= 1 && _parameters[0] == L"MEDIA-PATHS")
 		{
-			replyString << caspar::env::playout_folders();
+			boost::property_tree::wptree info;
+			info.add_child(L"paths", caspar::env::properties().get_child(L"configuration.paths.playout-paths"));
+			boost::property_tree::write_xml(replyString, info, w);
 		}
 		else if(_parameters.size() >= 1 && _parameters[0] == L"QUEUES")
 		{
