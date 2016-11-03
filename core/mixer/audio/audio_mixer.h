@@ -59,7 +59,10 @@ public:
 
 	float get_master_volume() const;
 	void set_master_volume(float volume);
-
+	/**/
+	double get_volume() const;
+	std::wstring get_volumeinfo() const;
+	/**/
 	audio_buffer operator()(const video_format_desc& format_desc, const channel_layout& layout);
 
 	monitor::subject& monitor_output();

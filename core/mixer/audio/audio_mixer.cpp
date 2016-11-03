@@ -78,7 +78,11 @@ struct audio_mixer::implementation
 	float								master_volume_;
 	float								previous_master_volume_;
 	monitor::subject					monitor_subject_;
-	
+	/**/
+	double								volume_;
+	std::wstring						audioinfo;
+	std::vector<audio_buffer_ps>		buffers;
+	/**/
 public:
 	implementation(const safe_ptr<diagnostics::graph>& graph)
 		: graph_(graph)
@@ -157,6 +161,18 @@ public:
 		master_volume_ = volume;
 	}
 	
+	/**/
+	double get_volume()
+	{
+		return volume_;
+	}
+
+	std::wstring get_volumeinfo()
+	{
+		return audioinfo;
+	}
+	/**/
+
 	audio_buffer mix(const video_format_desc& format_desc, const channel_layout& layout)
 	{	
 		if(format_desc_ != format_desc)
@@ -224,6 +240,8 @@ public:
 		}
 
 		audio_buffer_ps result_ps(audio_size(audio_cadence_.front()), 0.0f);
+		
+		std::wstringstream audio_string;
 
 		BOOST_FOREACH(auto& stream, audio_streams_ | boost::adaptors::map_values)
 		{
@@ -233,6 +251,40 @@ public:
 			{
 				stream.audio_data.resize(result_ps.size(), 0.0f);
 				CASPAR_LOG(trace) << L"[audio_mixer] Appended zero samples";
+			}
+
+			int buffersize = buffers.size();
+
+			if (buffersize>0)
+				buffers.clear();
+
+			for (int i = 0; i<channel_layout_.num_channels; i++)
+			{
+				audio_buffer_ps buf;
+				buf.reserve(result_ps.size() / channel_layout_.num_channels);
+				buffers.push_back(buf);
+			}
+			buffersize = buffers.size();
+
+
+			int csize = stream.audio_data.size();
+
+			for (int c = 0; c<csize; c += channel_layout_.num_channels)
+			{
+				for (int j = 0; j<buffersize; j++)
+				{
+					buffers.at(j).push_back(stream.audio_data.at(c + j));
+				}
+			}
+
+			for (int j = 0; j<buffersize; j++)
+			{
+				auto _max_ = boost::range::max_element(buffers[j]);
+				double _volume_ = static_cast<double>(std::abs(*_max_)) / std::numeric_limits<int32_t>::max();
+				//SIGMA_LOG(trace) << _volume_;
+				audio_string << _volume_;
+				if (j<buffersize)
+					audio_string << L"#";
 			}
 
 			auto out = boost::range::transform(result_ps, stream.audio_data, std::begin(result_ps), std::plus<double>());
@@ -271,7 +323,13 @@ public:
 		}
 
 		graph_->set_value("volume", static_cast<double>(*boost::max_element(max)) / std::numeric_limits<int32_t>::max());
+		
+		auto max_ = boost::range::max_element(result);
+		volume_ = static_cast<double>(std::abs(*max_)) / std::numeric_limits<int32_t>::max();
 
+		audioinfo = audio_string.str();
+		std::string str( audioinfo.begin(), audioinfo.end() );
+		monitor_subject_ << monitor::message("/audio_info") % str;
 		return result;
 	}
 
@@ -302,5 +360,6 @@ float audio_mixer::get_master_volume() const { return impl_->get_master_volume()
 void audio_mixer::set_master_volume(float volume) { impl_->set_master_volume(volume); }
 audio_buffer audio_mixer::operator()(const video_format_desc& format_desc, const channel_layout& layout){return impl_->mix(format_desc, layout);}
 monitor::subject& audio_mixer::monitor_output(){return impl_->monitor_subject_;}
-
+double audio_mixer::get_volume() const{ return impl_->get_volume(); };
+std::wstring audio_mixer::get_volumeinfo() const{ return impl_->get_volumeinfo(); };
 }}
